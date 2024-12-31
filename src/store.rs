@@ -3,6 +3,8 @@ use std::fs::{self, File};
 use std::io::{self, Write};
 use std::path::Path;
 
+use colored::*;
+
 use crate::task::Task;
 
 pub const TAGS_FILE: &str = "tags.json";
@@ -55,4 +57,39 @@ pub fn save_tags(tags: &[String]) -> Result<(), StoreError> {
     let mut file = File::create(TAGS_FILE)?;
     file.write_all(data.as_bytes())?;
     Ok(())
+}
+
+pub fn display_tags(tags: &[String]) {
+    println!("{}", "Tags Disponíveis:".bold().underline());
+
+    let columns = 3; // Número de colunas
+    for (i, tag) in tags.iter().enumerate() {
+        print!("{:<20}", tag.blue());
+        if (i + 1) % columns == 0 {
+            println!(); // Quebra de linha a cada `columns` tags
+        }
+    }
+    println!(); // Quebra final
+}
+
+pub fn display_tasks(tasks: &[Task]) {
+    println!("{}", "Tarefas:".bold().underline());
+    println!("{:<5} {:<30} {:<10} Tags", "ID", "Descrição", "Status");
+
+    for task in tasks {
+        let status = if task.done {
+            "✔️".green()
+        } else {
+            "⏳".yellow()
+        };
+
+        let tags = task.tags.join(", ");
+        println!(
+            "{:<5} {:<30} {:<10} {}",
+            task.id,
+            task.description,
+            status,
+            tags.cyan()
+        );
+    }
 }
